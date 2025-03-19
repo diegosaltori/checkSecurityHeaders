@@ -1,7 +1,3 @@
-Here is your README translated into English:  
-
----
-
 # Security Headers Verification with Selenium and Requests  
 
 This script allows checking whether a web application has the main **recommended security headers**, performing a manual login via **Selenium** and reusing the authenticated cookies to access the page via **Requests**.  
@@ -56,7 +52,3 @@ For each header:
 
 ---  
 Built to assist in the security auditing of web applications! 🔒  
-
----
-
-Let me know if you need any modifications! 🚀
