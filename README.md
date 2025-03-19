@@ -8,27 +8,32 @@ This script allows checking whether a web application has the main **recommended
 - **Uses the cookies in Requests** to access an authenticated page.  
 - **Checks the main security headers** in the page response.  
 - **Displays the headers found and those that are missing.**  
+- **Spinner indicators** for better user experience during processing.  
+- **Option to rerun the test (`yes`) or exit (`no`)** after completion.  
+- **User inputs the URL**, which is automatically formatted to ensure it starts with `https://`.  
 
 ## 🔧 Requirements  
 Before running the script, make sure you have the necessary dependencies installed:  
 
 ```bash
-pip install selenium requests
+pip install selenium requests webdriver-manager halo
 ```  
 
-You also need to have **ChromeDriver** installed and available in your system’s PATH. If you need to download it, visit:  
-- [ChromeDriver Download](https://sites.google.com/chromium.org/driver/)  
+You also need to have **ChromeDriver** and **GeckoDriver** installed. However, the script uses `webdriver-manager` to handle the driver installation automatically.  
 
 ## 🚀 How to Use  
-1. **Edit the script** and replace `url` with the application URL where you want to log in.  
-2. **Run the script:**  
+1. **Run the script:**  
    ```bash
-   python secHeaders.py
+   python check_headers.py
    ```  
+2. **Enter the URL of the web application** when prompted. The script will automatically add `https://` if missing.  
 3. **The browser will open automatically.**  
 4. **Log in manually. (If login is not required, proceed to the next step.)**  
 5. **Return to the terminal and press ENTER** once authenticated.  
 6. The script will close the browser, reuse the cookies, and check for security headers.  
+7. After completion, you will be asked:  
+   - Enter `yes` to run the test again.  
+   - Enter `no` to exit the script.  
 
 ## 🔍 Security Headers Checked  
 The script verifies the presence of the following security headers:  
@@ -45,10 +50,40 @@ For each header:
 ✅ If found, the value will be displayed in a formatted way.  
 ⚠️ If missing, a warning message will be shown.  
 
-## 🛠 Possible Improvements  
-- Add logs or export results to a file.  
-- Support for other browsers (Firefox, Edge).  
-- Option to test multiple URLs automatically.  
+## 📝 Example Output  
+### Terminal Output  
+```plaintext
+🔍 Checking security headers for: https://example.com
+
+✅ Strict-Transport-Security:
+max-age=31536000; includeSubDomains
+----------------------------------------
+✅ Content-Security-Policy:
+default-src 'self'; script-src 'self' https://trusted.com
+----------------------------------------
+⚠️ X-Frame-Options not found!
+----------------------------------------
+⚠️ X-XSS-Protection not found!
+----------------------------------------
+```  
+
+### Log File (`security_headers_log.txt`)  
+```plaintext
+2025-03-19 12:00:00 - INFO - 🔍 Checking security headers for: https://example.com
+2025-03-19 12:00:01 - INFO - ✅ Strict-Transport-Security:
+max-age=31536000; includeSubDomains
+----------------------------------------
+2025-03-19 12:00:01 - INFO - ✅ Content-Security-Policy:
+default-src 'self'; script-src 'self' https://trusted.com
+----------------------------------------
+2025-03-19 12:00:01 - WARNING - ⚠️ X-Frame-Options not found!
+----------------------------------------
+2025-03-19 12:00:01 - WARNING - ⚠️ X-XSS-Protection not found!
+----------------------------------------
+```  
 
 ---  
 Built to assist in the security auditing of web applications! 🔒  
+
+---  
+Developed by **Diego Garcia Saltori**
