@@ -16,7 +16,7 @@ This script allows checking whether a web application has the main **recommended
 Before running the script, make sure you have the necessary dependencies installed:  
 
 ```bash
-pip install selenium requests webdriver-manager halo
+pip install selenium requests webdriver-manager halo keyboard
 ```  
 
 > The script uses `webdriver-manager` to automatically handle the installation of **ChromeDriver**, **GeckoDriver**, and **EdgeDriver**. This means you don’t need to install them manually. However, if you already have them installed, the script will still work without issues.
@@ -74,16 +74,16 @@ default-src 'self'; script-src 'self' https://trusted.com
 
 ### Log File (`security_headers_log.txt`)  
 ```plaintext
-2025-03-19 12:00:00 - INFO - 🔍 Checking security headers for: https://example.com
-2025-03-19 12:00:01 - INFO - ✅ Strict-Transport-Security:
+2025-03-19 12:00:00 - INFO - Checking security headers for: https://example.com
+2025-03-19 12:00:01 - INFO - Strict-Transport-Security:
 max-age=31536000; includeSubDomains
 ----------------------------------------
-2025-03-19 12:00:01 - INFO - ✅ Content-Security-Policy:
+2025-03-19 12:00:01 - INFO - Content-Security-Policy:
 default-src 'self'; script-src 'self' https://trusted.com
 ----------------------------------------
-2025-03-19 12:00:01 - WARNING - ⚠️ X-Frame-Options not found!
+2025-03-19 12:00:01 - WARNING - X-Frame-Options not found!
 ----------------------------------------
-2025-03-19 12:00:01 - WARNING - ⚠️ X-XSS-Protection not found!
+2025-03-19 12:00:01 - WARNING - X-XSS-Protection not found!
 ----------------------------------------
 ```  
 
