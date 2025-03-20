@@ -1,4 +1,6 @@
-# Security Headers Verification with Selenium and Requests  
+<h1 align="center">Checking Security</h1>
+
+# 🔄 Check Security Headers
 
 This script allows checking whether a web application has the main **recommended security headers**, performing a manual login via **Selenium** and reusing the authenticated cookies to access the page via **Requests**.  
 
@@ -90,5 +92,90 @@ default-src 'self'; script-src 'self' https://trusted.com
 ---  
 Built to assist in the security auditing of web applications! 🔒  
 
+---
+
+# 🔄 Check Rate Limit
+
+This script allows testing the **rate limits** of a web API or website by sending multiple requests and monitoring the response headers. It supports **manual login via Selenium**, retrieving authenticated session cookies, and reusing them in **Requests** for testing.  
+
+## 📌 Features  
+- **Opens the browser with Selenium** for manual login if required.  
+- **Retrieves session cookies** after a successful login.  
+- **Uses the cookies in Requests** to send multiple authenticated requests.  
+- **Checks rate limit headers** like `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset`.  
+- **Handles rate limit restrictions** by detecting `Retry-After` headers.  
+- **Spinner indicators** for better user experience during processing.  
+- **Allows re-running the test (`yes`) or exiting (`no`)** after completion.  
+- **User inputs the URL and number of requests**, ensuring valid values.  
+
+## 🔧 Requirements  
+Before running the script, install the necessary dependencies:  
+
+```bash
+pip install selenium requests webdriver-manager halo keyboard
+```  
+
+> The script automatically installs **ChromeDriver**, **GeckoDriver**, and **EdgeDriver** using `webdriver-manager`. If you already have them installed, it will still work.  
+
+## 🚀 How to Use  
+1. **Run the script:**  
+   ```bash
+   python check_rate_limit.py
+   ```  
+2. **Enter the website URL** when prompted. The script will automatically add `https://` if missing.  
+3. **Enter the number of requests** to be sent.  
+4. **Choose a browser:** Chrome, Firefox, or Edge.  
+5. **The selected browser will open automatically.**  
+6. **Log in manually (if required).**  
+7. **Return to the terminal and press ENTER** once authenticated.  
+8. The script will close the browser, reuse the cookies, and start testing the rate limits.  
+9. After completion, you will be asked:  
+   - Enter `yes` to run the test again.  
+   - Enter `no` to exit the script.  
+
+## 📊 Rate Limit Headers Checked  
+The script retrieves and displays the following headers from the server responses:  
+
+- `X-RateLimit-Limit` → Maximum number of requests allowed.  
+- `X-RateLimit-Remaining` → Number of remaining requests before hitting the limit.  
+- `X-RateLimit-Reset` → Time when the rate limit resets (in UNIX timestamp).  
+- `Retry-After` → Indicates how long to wait before making another request.  
+
+If rate limits are exceeded, the script will stop and notify the user.  
+
+## 📝 Example Output  
+### Terminal Output  
+```plaintext
+🔄 Testing rate limits for: https://api.github.com | Requests: 5
+
+✅ Request 1: Status Code: 200
+   ➜ X-RateLimit-Limit: 5000
+   ➜ X-RateLimit-Remaining: 4999
+----------------------------------------
+✅ Request 2: Status Code: 200
+   ➜ X-RateLimit-Limit: 5000
+   ➜ X-RateLimit-Remaining: 4998
+----------------------------------------
+⚠️ Rate limit exceeded! Retry after 30 seconds.
+```  
+
+### Log File (`rate_limit_log.txt`)  
+```plaintext
+2025-03-19 12:30:00 - INFO - Testing rate limits for: https://api.github.com | Requests: 5
+2025-03-19 12:30:01 - INFO - Request 1: Status Code: 200
+2025-03-19 12:30:01 - INFO - X-RateLimit-Limit: 5000
+2025-03-19 12:30:01 - INFO - X-RateLimit-Remaining: 4999
+----------------------------------------
+2025-03-19 12:30:02 - INFO - Request 2: Status Code: 200
+2025-03-19 12:30:02 - INFO - X-RateLimit-Remaining: 4998
+----------------------------------------
+2025-03-19 12:30:05 - WARNING - Rate limit exceeded! Retry after 30 seconds.
+----------------------------------------
+```  
+
 ---  
+Built to analyze and test the rate limits of web APIs efficiently! 🔄  
+
+---  
+
 Developed by **Diego Garcia Saltori**
