@@ -231,4 +231,56 @@ pip install selenium requests webdriver-manager halo keyboard
 ---  
 Built to help identify IDOR vulnerabilities in web applications! 🔍  
 
+---
+# 🔄 XSS Security Testing
+
+## Overview
+The `check XSS` script is designed to automate the testing for Cross-Site Scripting (XSS) vulnerabilities in web applications. It sends various payloads to predefined endpoints and analyzes responses to detect potential security risks.
+
+## How It Works
+1. The script retrieves the target URL.
+2. It performs an authentication process and sets session cookies.
+3. It iterates through a list of known XSS payloads.
+4. For each payload, it sends requests to multiple endpoints.
+5. It checks whether the payload is reflected in the response.
+6. Results are logged and displayed, indicating whether a potential XSS vulnerability was found.
+
+## 🔧 Requirements  
+Before running the script, install the necessary dependencies:  
+
+```bash
+pip install selenium requests webdriver-manager halo keyboard
+```
+## Usage
+```sh
+python check_xss.py
+```
+Follow the on-screen prompts to input the target URL.
+
+## XSS Payloads Tested
+The script includes a comprehensive list of common XSS payloads, including:
+- Script injection (`<script>alert('XSS')</script>`)
+- Event-based attacks (`<img src=x onerror=alert('XSS')>`)
+- URI scheme attacks (`javascript:alert('XSS')`)
+- Input field exploits (`<input type=text value='' onfocus=alert('XSS')>`)
+- HTML attribute manipulation (`"><script>alert('XSS')</script>`)
+- Other advanced techniques (`<math><mtext><style onload=alert('XSS')></style></mtext></math>`)
+
+## Logging and Output
+Results are displayed in the terminal with:
+- `⚠️ Potential XSS detected` if the payload is reflected
+- `✅ No XSS` if no vulnerability is found
+All results are logged to a file for further analysis.
+
+## Customization
+- Modify the `XSS_PAYLOADS` list in `check_xss.py` to add/remove test cases.
+- Change `endpoints` to test specific parts of your application.
+- Adjust the logging settings in `Functions.setup_logger_xss()`.
+
+## Disclaimer
+This tool is intended for security professionals and ethical hackers to test their own applications. Unauthorized use against third-party systems is strictly prohibited.
+
+## License
+MIT License
+
 Developed by **Diego Garcia Saltori**
