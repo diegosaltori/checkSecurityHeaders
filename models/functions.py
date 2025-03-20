@@ -44,6 +44,14 @@ class Functions:
           Developed by Diego Garcia Saltori
         ======================================
         """)
+    def banner_idor():
+        print("""
+        ======================================
+              Checking Security IDOR  
+                   Version 1.0.1
+          Developed by Diego Garcia Saltori
+        ======================================
+        """)
     # Function to capture the website URL
     def get_url():
         """Captures the website URL from the user."""
@@ -108,6 +116,17 @@ class Functions:
             datefmt="%Y-%m-%d %H:%M:%S"
         )
 
+    @staticmethod
+    def setup_logger_idor():
+        """Sets up the logger for IDOR testing, creating a log file with a timestamp."""
+        log_filename = os.path.join(Functions.LOG_DIR, f"log_idor_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt")
+        logging.basicConfig(
+            filename=log_filename,
+            level=logging.INFO,
+            format="%(asctime)s - %(levelname)s - %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S"
+        )
+        
     @staticmethod
     def setup_logger_headers():
         """Sets up the logger for security header verification, creating a log file with a timestamp."""

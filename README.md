@@ -74,7 +74,7 @@ default-src 'self'; script-src 'self' https://trusted.com
 ----------------------------------------
 ```  
 
-### Log File (`security_headers_log.txt`)  
+### Log File (`log_headers_YYYY-MM-DD-HH-MM-SS.txt`)  
 ```plaintext
 2025-03-19 12:00:00 - INFO - Checking security headers for: https://example.com
 2025-03-19 12:00:01 - INFO - Strict-Transport-Security:
@@ -159,7 +159,7 @@ If rate limits are exceeded, the script will stop and notify the user.
 ⚠️ Rate limit exceeded! Retry after 30 seconds.
 ```  
 
-### Log File (`rate_limit_log.txt`)  
+### Log File (`log_rate_limit_YYYY-MM-DD-HH-MM-SS.txt`)  
 ```plaintext
 2025-03-19 12:30:00 - INFO - Testing rate limits for: https://api.github.com | Requests: 5
 2025-03-19 12:30:01 - INFO - Request 1: Status Code: 200
@@ -177,5 +177,58 @@ If rate limits are exceeded, the script will stop and notify the user.
 Built to analyze and test the rate limits of web APIs efficiently! 🔄  
 
 ---  
+# 🔄 Check IDOR Vulnerabilities
+
+This script tests for **Insecure Direct Object References (IDOR)** vulnerabilities by attempting to access various endpoints using different user IDs and common values. The script uses session cookies to authenticate requests and logs potential vulnerabilities found.
+
+## 📌 Features  
+- **Performs authentication using session cookies.**  
+- **Tests a list of common ID values** to check for IDOR issues.  
+- **Checks multiple sensitive endpoints** such as `/user/`, `/account/`, `/admin/`, `/dashboard/`, etc.  
+- **Logs any potential IDOR vulnerabilities detected.**  
+- **Provides an option to rerun the test (`yes`) or exit (`no`).**  
+- **Displays real-time processing with a loading spinner.**  
+
+## 🔧 Requirements  
+Before running the script, install the necessary dependencies:  
+
+```bash
+pip install selenium requests webdriver-manager halo keyboard
+```
+
+## 🚀 How to Use  
+1. **Run the script:**  
+   ```bash
+   python check_idor.py
+   ```  
+2. **The script will prompt for a URL** where the test will be performed.  
+3. **Performs login automatically** and retrieves session cookies.  
+4. **Iterates through different ID values** (e.g., `1`, `2`, `9999`, `-1`, `admin`, etc.).  
+5. **Tests multiple endpoints** (`/user/`, `/account/`, `/admin/`, etc.).  
+6. **Logs any endpoints that return HTTP 200**, indicating a potential IDOR vulnerability.  
+7. After completion, you will be asked:  
+   - Enter `yes` to run the test again.  
+   - Enter `no` to exit the script.  
+
+## 📝 Example Output  
+### Terminal Output  
+```plaintext
+🔍 Testing IDOR vulnerabilities on: https://example.com
+
+⚠️ Potential IDOR detected at: https://example.com/user/9999 (Status: 200)
+✅ No IDOR at: https://example.com/admin/guest (Status: 403)
+----------------------------------------
+```  
+
+### Log File (`log_idor_YYYY-MM-DD-HH-MM-SS.txt`)  
+```plaintext
+2025-03-19 12:30:00 - INFO - Testing IDOR vulnerabilities on: https://example.com
+2025-03-19 12:30:01 - WARNING - Potential IDOR detected at: https://example.com/user/9999 (Status: 200)
+2025-03-19 12:30:02 - INFO - No IDOR at: https://example.com/admin/guest (Status: 403)
+----------------------------------------
+```  
+
+---  
+Built to help identify IDOR vulnerabilities in web applications! 🔍  
 
 Developed by **Diego Garcia Saltori**
