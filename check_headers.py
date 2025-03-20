@@ -2,13 +2,14 @@ import textwrap
 import requests
 import logging
 import sys
-import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.edge.service import Service as EdgeService
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
 from halo import Halo
 
 def setup_logger():
@@ -27,11 +28,15 @@ def print_banner():
     """)
 
 def choose_browser():
-    print("Choose a browser: (1) Chrome | (2) Firefox")
-    choice = input("Enter 1 or 2: ").strip()
+    print("Choose a browser: (1) Chrome | (2) Firefox | (3) Edge")
+    choice = input("Enter 1, 2, or 3: ").strip()
+    
     if choice == "2":
         service = FirefoxService(GeckoDriverManager().install())
         return webdriver.Firefox(service=service)
+    elif choice == "3":
+        service = EdgeService(EdgeChromiumDriverManager().install())
+        return webdriver.Edge(service=service)
     else:
         service = ChromeService(ChromeDriverManager().install())
         return webdriver.Chrome(service=service)
@@ -45,9 +50,9 @@ def get_url():
 def check_security_headers():
     first_run = True
     while True:
-        if not first_run:
-            print("\nDo you want to run the test again?")
-            user_input = input("Enter 'yes' to restart or 'no' to quit: ").strip().lower()
+        if not first_run:            
+            print("\nDo you want to run the test again?")           
+            user_input = input("Enter 'yes' to restart or 'no' to quit: ").strip().lower()            
             if user_input == "no":
                 print("Exiting...")
                 sys.exit()
@@ -63,9 +68,11 @@ def check_security_headers():
             spinner.start()
             driver.get(url)
             spinner.stop()
-            print("🔹 Log in manually and press ENTER in the terminal when ready.")
-            input("Press ENTER to continue after logging in...")
             
+            print("🔹 If login is required, complete it manually and press ENTER in the terminal when done.")
+
+            input("Press ENTER to continue once you have completed the login (if required)...")
+           
             spinner.text = "Retrieving cookies..."
             spinner.start()
             cookies = driver.get_cookies()

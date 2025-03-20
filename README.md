@@ -19,7 +19,9 @@ Before running the script, make sure you have the necessary dependencies install
 pip install selenium requests webdriver-manager halo
 ```  
 
-You also need to have **ChromeDriver** and **GeckoDriver** installed. However, the script uses `webdriver-manager` to handle the driver installation automatically.  
+> The script uses `webdriver-manager` to automatically handle the installation of **ChromeDriver**, **GeckoDriver**, and **EdgeDriver**. This means you don’t need to install them manually. However, if you already have them installed, the script will still work without issues.
+
+Aqui está a versão atualizada do seu README com a informação sobre a escolha do navegador:  
 
 ## 🚀 How to Use  
 1. **Run the script:**  
@@ -27,13 +29,16 @@ You also need to have **ChromeDriver** and **GeckoDriver** installed. However, t
    python check_headers.py
    ```  
 2. **Enter the URL of the web application** when prompted. The script will automatically add `https://` if missing.  
-3. **The browser will open automatically.**  
-4. **Log in manually. (If login is not required, proceed to the next step.)**  
-5. **Return to the terminal and press ENTER** once authenticated.  
-6. The script will close the browser, reuse the cookies, and check for security headers.  
-7. After completion, you will be asked:  
+3. **Choose a browser:** You will be prompted to select **Chrome**, **Firefox**, or **Edge**.  
+4. **The selected browser will open automatically.**  
+5. **Log in manually. (If login is not required, proceed to the next step.)**  
+6. **Return to the terminal and press ENTER** once authenticated.  
+7. The script will close the browser, reuse the cookies, and check for security headers.  
+8. After completion, you will be asked:  
    - Enter `yes` to run the test again.  
    - Enter `no` to exit the script.  
+
+
 
 ## 🔍 Security Headers Checked  
 The script verifies the presence of the following security headers:  
