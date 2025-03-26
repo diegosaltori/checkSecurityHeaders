@@ -61,6 +61,14 @@ class Functions:
           Developed by Diego Garcia Saltori
         ======================================
         """)
+    def banner_auth():
+        print("""
+        ======================================
+               Checking Authentication  
+                   Version 1.0.1
+          Developed by Diego Garcia Saltori
+        ======================================
+        """)
     # Function to capture the website URL
     def get_url():
         """Captures the website URL from the user."""
@@ -145,7 +153,18 @@ class Functions:
             level=logging.INFO,
             format="%(asctime)s - %(levelname)s - %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S"
-        )        
+        )      
+        
+    @staticmethod
+    def setup_logger_auth():
+        """Sets up the logger for Authentication testing, creating a log file with a timestamp."""
+        log_filename = os.path.join(Functions.LOG_DIR, f"log_auth_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt")
+        logging.basicConfig(
+            filename=log_filename,
+            level=logging.INFO,
+            format="%(asctime)s - %(levelname)s - %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S"
+        )    
     @staticmethod
     def setup_logger_headers():
         """Sets up the logger for security header verification, creating a log file with a timestamp."""
