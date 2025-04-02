@@ -27,32 +27,43 @@ def check_security_headers():
 
             spinner = Halo(text='Fetching security headers...', spinner='dots')
             spinner.start()
-            response = session.get(url)  # Usando a URL digitada pelo usuário
-            headers = response.headers
+            response = session.get(url, allow_redirects=True)  # Permite redirecionamentos
             spinner.stop()
             
-            security_headers = [
+            security_headers = [                
+                "X-XSS-Protection",
+                "X-Frame-Options",
+                "X-Content-Type-Options",
                 "Strict-Transport-Security",
                 "Content-Security-Policy",
-                "X-Frame-Options",
-                "X-XSS-Protection",
-                "X-Content-Type-Options",
                 "Referrer-Policy",
-                "Permissions-Policy"
+                "Permissions-Policy",
+                "Cross-Origin-Embedder-Policy",
+                "Cross-Origin-Resource-Policy",
+                "Cross-Origin-Opener-Policy"
             ]
-            
-            log_output = f"\n🔍 Checking security headers for: {response.url}\n"
-            print(log_output)
-            logging.info(Functions.remove_emojis(log_output))
 
-            for header in security_headers:
-                if header in headers:
-                    wrapped_value = textwrap.fill(headers[header], width=80)
-                    result = f"✅ {header}:\n{wrapped_value}\n{'-'*40}"
-                else:
-                    result = f"⚠️ {header} not found!\n{'-'*40}"
-                print(result)
-                logging.info(Functions.remove_emojis(result))
+            # Lista todas as URLs visitadas (redirecionamentos)
+            urls_checked = response.history + [response]
+
+            for i, resp in enumerate(urls_checked):
+                log_output = f"\n🔍 Checking security headers for: {resp.url} (Redirect {i})\n"
+                print(log_output)
+                logging.info(Functions.remove_emojis(log_output))
+
+                headers = resp.headers
+                for header in security_headers:
+                    if header in headers:
+                        wrapped_value = textwrap.fill(headers[header], width=80)
+                        result = f"✅ {header}:\n{wrapped_value}\n{'-'*40}"
+                    else:
+                        result = f"⚠️ {header} not found!\n{'-'*40}"
+                    print(result)
+                    logging.info(Functions.remove_emojis(result))
+
+            # Mostra a URL final (Effective URL)
+            print(f"\n🌐 Effective URL: {response.url}")
+            logging.info(f"Effective URL: {response.url}")
 
         except Exception as e:
             error_msg = f"Error: {e}"

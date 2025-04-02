@@ -5,7 +5,7 @@ Before running the scripts, it is recommended to create and activate a virtual e
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # On macOS and Linux
+source venv/scripts/activate  # On macOS and Linux
 venv\Scripts\activate    # On Windows
 ```
 
