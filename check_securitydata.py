@@ -2,109 +2,95 @@ import re
 import sys
 import json
 import logging
-from seleniumwire import webdriver  # Selenium Wire para interceptar requisições
+from seleniumwire import webdriver  # Selenium Wire for intercepting requests
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from models.functions import Functions
 
 def check_api_exposure():
-    """Abre o navegador e intercepta requisições de API para verificar exposição de dados."""
+    """Opens the browser and intercepts API requests to check for data exposure."""
     while True:
         url = Functions.get_url()
+        monitored_api = input("Enter the base URL of the API you want to monitor (optional, press ENTER to skip): ").strip()
         
         try:
             driver = setup_browser()
             driver.get(url)
             
-            print("🔹 Complete o login e navegue pela aplicação.")
-            input("🔹 Quando terminar, pressione ENTER para analisar as requisições...")
+            print("🔹 Complete the login and navigate through the application.")
+            input("🔹 When finished, press ENTER to analyze the requests...")
 
-            print("\n🔍 Interceptando requisições de API...")
-            intercept_api_requests(driver)
+            print("\n🔍 Intercepting API requests and JS files...")
+            intercept_requests(driver, monitored_api)
         
         except Exception as e:
-            logging.error(f"Erro: {e}")
+            logging.error(f"Error: {e}")
         
         finally:
             driver.quit()
 
-        user_input = input("Deseja rodar o teste novamente? (yes/no): ").strip().lower()
+        user_input = input("Do you want to run the test again? (yes/no): ").strip().lower()
         if user_input != "yes":
-            print("Saindo...")
+            print("Exiting...")
             sys.exit()
 
 def setup_browser():
-    """Configura e retorna um navegador com Selenium Wire para interceptação de APIs."""
+    """Configures and returns a browser with Selenium Wire for API and JS interception."""
     options = Options()
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     service = Service(ChromeDriverManager().install())
-    return webdriver.Chrome(service=service, options=options)  # Selenium Wire
+    return webdriver.Chrome(service=service, options=options)
 
-def intercept_api_requests(driver):
-    """Intercepta requisições de API feitas pelo navegador e verifica se há dados sensíveis."""
+def intercept_requests(driver, monitored_api):
+    """Intercepts API requests and JavaScript files made by the browser."""
     patterns = {
-        "API Keys": r"(?i)(api_key|apikey|auth_token|access_token|secret|password)[=:\"'](\S+)",
+        "API Keys": r"(?i)(api_key|apikey|auth_token|access_token|secret|password|REACT_APP_API_KEY)[=:\"'](\S+)",
         "Emails": r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+",
         "JWT Tokens": r"eyJ[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+\.[a-zA-Z0-9_\-]+",
         "CPF": r"\b\d{3}\.\d{3}\.\d{3}-\d{2}\b",
         "CNPJ": r"\b\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}\b",
-        "Cartão de Crédito": r"\b(\d{4}[- ]?){3}\d{4}\b",
-        "Stack Traces": r"(Exception|Error|Traceback).*?\n",
+        "Credit Card": r"\b(\d{4}[- ]?){3}\d{4}\b",
     }
     
     if not driver.requests:
-        print("⚠️ Nenhuma requisição interceptada. Verifique se há tráfego na aplicação.")
-
+        print("⚠️ No requests intercepted. Check if there is traffic in the application.")
+    
     for request in driver.requests:
         if request.response:
             try:
                 content_type = request.response.headers.get('Content-Type', '')
                 
-                # Verifica se a resposta é JSON
-                if "json" in content_type:
-                    response_body = request.response.body.decode('utf-8', errors='ignore')
-                    print(f"\n🌐 Interceptado: {request.url}")
-                    analyze_api_response(response_body, patterns)
-                
-                # Verifica se há headers sensíveis
-                analyze_headers(request.response.headers)
+                # Checks if the URL matches the monitored API or if no API was specified
+                if not monitored_api or monitored_api in request.url:
+                    print(f"\n🌐 Intercepted: {request.url}")
+                    
+                    # If it's JSON, check for sensitive data
+                    if "json" in content_type:
+                        response_body = request.response.body.decode('utf-8', errors='ignore')
+                        analyze_response(response_body, patterns)
+                    
+                    # If it's a JS file, check for possible data exposure
+                    elif request.url.endswith(".js"):
+                        response_body = request.response.body.decode('utf-8', errors='ignore')
+                        analyze_response(response_body, patterns)
+            
             except Exception as e:
-                print(f"⚠️ Erro ao processar resposta de {request.url}: {e}")
+                print(f"⚠️ Error processing response from {request.url}: {e}")
 
-    input("\n🛑 Pressione ENTER para encerrar o teste e fechar o navegador.")
-
-def analyze_api_response(response, patterns):
-    """Verifica se há dados sensíveis na resposta das APIs."""
-    try:
-        data = json.loads(response)  # Tenta carregar como JSON estruturado
-        response_str = json.dumps(data, indent=2)  # Converte para string formatada
-    except json.JSONDecodeError:
-        response_str = response  # Se não for JSON, mantém como string
-    
+def analyze_response(response, patterns):
+    """Checks for sensitive data in API responses and JS files."""
     for name, pattern in patterns.items():
-        matches = re.findall(pattern, response_str)
+        matches = re.findall(pattern, response)
         if matches:
-            print(f"⚠️ Possível exposição de {name} encontrada:")
+            print(f"⚠️ Possible exposure of {name} found:")
             for match in matches:
                 print(f"  - {match}")
             print('-' * 40)
         else:
-            print(f"✅ Nenhuma exposição de {name} detectada.")
+            print(f"✅ No exposure of {name} detected.")
 
-def analyze_headers(headers):
-    """Verifica headers de resposta para possíveis falhas de segurança."""
-    risky_headers = {
-        "Server": "Pode expor detalhes do servidor.",
-        "X-Powered-By": "Pode revelar tecnologia usada.",
-        "Access-Control-Allow-Origin": "CORS aberto pode permitir vazamento de dados.",
-    }
-    
-    for header, warning in risky_headers.items():
-        if header in headers:
-            print(f"⚠️ Cabeçalho '{header}' encontrado: {headers[header]} -> {warning}")
-    
 if __name__ == "__main__":
     Functions.setup_logger_security_data_exposure()
     Functions.banner_securitydata()
