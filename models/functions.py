@@ -69,6 +69,15 @@ class Functions:
           Developed by Diego Garcia Saltori
         ======================================
         """)
+        
+    def banner_securitydata():
+        print("""
+        ======================================
+               Checking Data Exposure  
+                   Version 1.0.1
+          Developed by Diego Garcia Saltori
+        ======================================
+        """)
     # Function to capture the website URL
     def get_url():
         """Captures the website URL from the user."""
@@ -95,6 +104,27 @@ class Functions:
                     print("Please enter a valid positive number.")
             except ValueError:
                 print("Invalid input. Please enter a number.")
+                
+    def perform_loginsource(url):
+        """Opens the selected browser, waits for user login, retrieves cookies, and captures page source."""
+        driver = choose_browser()
+        
+        spinner = Halo(text='Opening browser...', spinner='dots')
+        spinner.start()
+        driver.get(url)
+        spinner.stop()
+        
+        print("🔹 If login is required, complete it manually and press ENTER in the terminal when done.")
+        input("Press ENTER to continue once you have completed the login...")
+
+        spinner.text = "Retrieving cookies and page source..."
+        spinner.start()
+        cookies = driver.get_cookies()
+        page_source = driver.page_source  # Captura o HTML da página
+        driver.quit()
+        spinner.stop()
+        
+        return cookies, page_source  # Retorna os cookies e o HTML da página
 
     # Function to perform login and retrieve cookies
     def perform_login(url):
@@ -175,6 +205,17 @@ class Functions:
             format="%(asctime)s - %(levelname)s - %(message)s",
             datefmt="%Y-%m-%d %H:%M:%S"
         )    
+    @staticmethod
+    def setup_logger_security_data_exposure():
+        """Sets up the logger for security data exposure verification, creating a log file with a timestamp."""
+        log_filename = os.path.join(Functions.LOG_DIR, f"log_security_data_exposure_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt")
+        logging.basicConfig(
+            filename=log_filename,
+            level=logging.INFO,
+            format="%(asctime)s - %(levelname)s - %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S"
+        )
+
         
     def remove_emojis(text):
         """Removes specific emojis from the given text."""

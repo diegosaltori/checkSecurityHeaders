@@ -1,5 +1,14 @@
 <h1 align="center">Checking Security</h1>
 
+## 🔧 Requirements  
+Before running the scripts, it is recommended to create and activate a virtual environment:
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On macOS and Linux
+venv\Scripts\activate    # On Windows
+```
+
 # 🔄 Check Security Headers
 
 This script allows checking whether a web application has the main **recommended security headers**, performing a manual login via **Selenium** and reusing the authenticated cookies to access the page via **Requests**.  
@@ -15,15 +24,13 @@ This script allows checking whether a web application has the main **recommended
 - **User inputs the URL**, which is automatically formatted to ensure it starts with `https://`.  
 
 ## 🔧 Requirements  
-Before running the script, make sure you have the necessary dependencies installed:  
+Install the necessary dependencies:
 
 ```bash
 pip install selenium requests webdriver-manager halo keyboard
-```  
+```
 
 > The script uses `webdriver-manager` to automatically handle the installation of **ChromeDriver**, **GeckoDriver**, and **EdgeDriver**. This means you don’t need to install them manually. However, if you already have them installed, the script will still work without issues.
-
-Aqui está a versão atualizada do seu README com a informação sobre a escolha do navegador:  
 
 ## 🚀 How to Use  
 1. **Run the script:**  
@@ -39,8 +46,6 @@ Aqui está a versão atualizada do seu README com a informação sobre a escolha
 8. After completion, you will be asked:  
    - Enter `yes` to run the test again.  
    - Enter `no` to exit the script.  
-
-
 
 ## 🔍 Security Headers Checked  
 The script verifies the presence of the following security headers:  
@@ -90,7 +95,7 @@ default-src 'self'; script-src 'self' https://trusted.com
 ```  
 
 ---  
-Built to assist in the security auditing of web applications! 🔒  
+Built to assist in the security auditing of web applications! 🔒
 
 ---
 
@@ -282,5 +287,76 @@ This tool is intended for security professionals and ethical hackers to test the
 
 ## License
 MIT License
+
+---
+
+# Security Headers & API Exposure Scanner
+
+This script is designed to analyze and intercept API requests in a web application using Selenium Wire. It detects potential security vulnerabilities, including exposed API keys, sensitive user information, and insecure response headers.
+
+## Features
+- Intercepts API requests while navigating the web application.
+- Detects exposed API keys, JWT tokens, email addresses, CPF, CNPJ, credit card numbers, and stack traces.
+- Checks response headers for potential security risks.
+- Allows deep navigation before finalizing the test.
+
+## Requirements
+- Python 3.x
+- Google Chrome
+- ChromeDriver (managed automatically by `webdriver_manager`)
+
+### Dependencies
+Install the required dependencies using pip:
+```bash
+pip install selenium selenium-wire webdriver-manager
+```
+
+## Usage
+1. Run the script:
+   ```bash
+   python security.py
+   ```
+2. Enter the target URL when prompted.
+3. Navigate through the application and interact with it.
+4. When ready, press `ENTER` to analyze API requests.
+5. Review detected vulnerabilities in the terminal.
+6. Press `ENTER` to finalize and close the browser.
+7. Choose whether to run the test again.
+
+## Sensitive Data Patterns Detected
+- **API Keys**
+- **Emails**
+- **JWT Tokens**
+- **CPF (Brazilian Tax ID)**
+- **CNPJ (Brazilian Company ID)**
+- **Credit Card Numbers**
+- **Stack Traces**
+
+## Security Headers Checked
+- `Server`
+- `X-Powered-By`
+- `Access-Control-Allow-Origin`
+
+## Example Output
+```
+🔹 Complete the login and navigate through the application.
+🔹 When finished, press ENTER to analyze requests...
+
+🌐 Intercepted: https://example.com/api/user
+⚠️ Possible exposure of Emails found:
+  - user@example.com
+----------------------------------------
+✅ No JWT Tokens detected.
+
+⚠️ Header 'Server' found: Apache -> May expose server details.
+```
+
+## Notes
+- Ensure Chrome is installed on your machine.
+- The script should be run in an environment with network access to the target application.
+
+## License
+This project is licensed under the MIT License.
+
 
 Developed by **Diego Garcia Saltori**
