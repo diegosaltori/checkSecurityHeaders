@@ -1,31 +1,50 @@
 import sys
 import os
+import time
 from datetime import datetime
 from halo import Halo
 import logging
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from selenium.webdriver.edge.service import Service as EdgeService
+# from selenium import webdriver
+from seleniumwire import webdriver  # Importa seleniumwire para capturar requisições
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.edge.options import Options as EdgeOptions
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.edge.service import Service as EdgeService
 
 # Function to choose a browser for login
 def choose_browser():
     """Allows the user to choose a browser for login."""
     print("Choose a browser: (1) Chrome | (2) Firefox | (3) Edge")
     choice = input("Enter 1, 2, or 3: ").strip()
-    
-    if choice == "2":
+
+    seleniumwire_options = {}  # Dicionário para armazenar opções do seleniumwire
+
+    if choice == "2":  # Firefox
+        options = FirefoxOptions()
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
         service = FirefoxService(GeckoDriverManager().install())
-        return webdriver.Firefox(service=service)
-    elif choice == "3":
+        return webdriver.Firefox(service=service, options=options, seleniumwire_options=seleniumwire_options)
+
+    elif choice == "3":  # Edge
+        options = EdgeOptions()
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
         service = EdgeService(EdgeChromiumDriverManager().install())
-        return webdriver.Edge(service=service)
-    else:
+        return webdriver.Edge(service=service, options=options, seleniumwire_options=seleniumwire_options)
+
+    else:  # Chrome (padrão)
+        options = Options()
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
         service = ChromeService(ChromeDriverManager().install())
-        return webdriver.Chrome(service=service)
+        return webdriver.Chrome(service=service, options=options, seleniumwire_options=seleniumwire_options)
+
 
 class Functions:
     def banner_header():
@@ -146,6 +165,71 @@ class Functions:
         spinner.stop()
         
         return cookies
+    
+    def get_bearer_token(login_url):
+        """Attempts to capture the Bearer token using network requests, localStorage, sessionStorage, and cookies."""
+        driver = choose_browser()
+
+        print("🔐 Opening browser for authentication...")
+        driver.get(login_url)
+
+        print("🔹 If login is required, complete it manually and press ENTER in the terminal when done.")
+        input("Press ENTER to continue once you have completed the login...")
+
+        # Aguarda carregamento
+        time.sleep(3)  
+
+        # 🔍 **1. Capturar o Token nas Requisições de Rede**
+        print("🔍 Searching for Bearer token in network requests...")
+        for request in driver.requests:
+            if request.response and "Authorization" in request.headers:
+                auth_header = request.headers["Authorization"]
+                if auth_header.startswith("Bearer "):
+                    bearer_token = auth_header.split("Bearer ")[1]
+                    print(f"✅ Bearer token found in network requests: {bearer_token[:20]}...")
+                    driver.quit()
+                    return bearer_token
+
+        # 🔍 **2. Capturar o Token no localStorage/sessionStorage**
+        print("🔍 Searching for Bearer token in localStorage/sessionStorage...")
+        script = """
+        let token = null;
+        for (let key in localStorage) {
+            if (key.toLowerCase().includes('token')) {
+                token = localStorage.getItem(key);
+                break;
+            }
+        }
+        if (!token) {
+            for (let key in sessionStorage) {
+                if (key.toLowerCase().includes('token')) {
+                    token = sessionStorage.getItem(key);
+                    break;
+                }
+            }
+        }
+        return token;
+        """
+        token_from_storage = driver.execute_script(script)
+        if token_from_storage:
+            print(f"✅ Bearer token found in storage: {token_from_storage[:20]}...")
+            driver.quit()
+            return token_from_storage
+
+        # 🔍 **3. Capturar o Token nos Cookies**
+        print("🔍 Searching for Bearer token in cookies...")
+        cookies = driver.get_cookies()
+        for cookie in cookies:
+            if "token" in cookie["name"].lower():  # Busca qualquer cookie que tenha "token" no nome
+                token_from_cookies = cookie["value"]
+                print(f"✅ Bearer token found in cookies: {token_from_cookies[:20]}...")
+                driver.quit()
+                return token_from_cookies
+
+        print("⚠️ No Bearer token found in network, storage, or cookies. Ensure you are logging into the correct endpoint.")
+        driver.quit()
+        return None
+
     
     # Criação da pasta de logs
     LOG_DIR = "logs"
