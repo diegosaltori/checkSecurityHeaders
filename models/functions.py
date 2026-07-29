@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from halo import Halo
 import logging
-from seleniumwire import webdriver
+from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.edge.options import Options as EdgeOptions
@@ -27,21 +27,21 @@ def choose_browser():
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         service = FirefoxService(GeckoDriverManager().install())
-        return webdriver.Firefox(service=service, options=options, seleniumwire_options=seleniumwire_options)
+        return webdriver.Firefox(service=service, options=options)
 
     elif choice == "3":  # Edge
         options = EdgeOptions()
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         service = EdgeService(EdgeChromiumDriverManager().install())
-        return webdriver.Edge(service=service, options=options, seleniumwire_options=seleniumwire_options)
+        return webdriver.Edge(service=service, options=options)
 
     else:  # Chrome (padrão)
         options = Options()
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         service = ChromeService(ChromeDriverManager().install())
-        return webdriver.Chrome(service=service, options=options, seleniumwire_options=seleniumwire_options)
+        return webdriver.Chrome(service=service, options=options)
 
 class Functions:
     # Application Banner

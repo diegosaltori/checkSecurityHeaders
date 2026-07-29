@@ -27,7 +27,8 @@ This script allows checking whether a web application has the main **recommended
 Install the necessary dependencies:
 
 ```bash
-pip install selenium selenium-wire requests webdriver-manager halo keyboard
+pip install selenium selenium-wire requests webdriver-manager halo keyboard setuptools blinker==1.7.0
+pip install --upgrade --force-reinstall setuptools
 ```
 
 > The script uses `webdriver-manager` to automatically handle the installation of **ChromeDriver**, **GeckoDriver**, and **EdgeDriver**. This means you don’t need to install them manually. However, if you already have them installed, the script will still work without issues.
