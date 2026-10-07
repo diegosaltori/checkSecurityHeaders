@@ -63,6 +63,9 @@ For each header:
 ✅ If found, the value will be displayed in a formatted way.  
 ⚠️ If missing, a warning message will be shown.  
 
+For `Content-Security-Policy`, the script also flags common issues for manual review:
+missing `default-src`, `object-src`, or `frame-ancestors` directives, and use of `*`, `'unsafe-inline'`, or `'unsafe-eval'`. A `Content-Security-Policy-Report-Only` header is reported separately because it does not enforce restrictions. These checks are heuristics, not a complete CSP validator; review the policy against the application's resources and browser console before tightening it.
+
 ## 📝 Example Output  
 ### Terminal Output  
 ```plaintext

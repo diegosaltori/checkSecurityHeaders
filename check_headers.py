@@ -5,6 +5,35 @@ from halo import Halo
 from models.functions import Functions, logging
 from models.clean_pycache import clean_pycache
 
+def analyze_csp(csp):
+    """Return practical warnings for common CSP omissions and weak values."""
+    directives = {}
+    for part in csp.split(';'):
+        tokens = part.strip().split()
+        if tokens:
+            directives[tokens[0].lower()] = tokens[1:]
+
+    warnings = []
+    if not directives:
+        return ["CSP header is empty or could not be parsed."]
+
+    if "default-src" not in directives:
+        warnings.append("default-src is missing; add a restrictive fallback policy.")
+    if "object-src" not in directives:
+        warnings.append("object-src is missing; consider object-src 'none'.")
+    if "frame-ancestors" not in directives:
+        warnings.append("frame-ancestors is missing; consider restricting who can embed this site.")
+
+    for name, values in directives.items():
+        if "*" in values:
+            warnings.append(f"{name} allows '*'.")
+        if "'unsafe-inline'" in values:
+            warnings.append(f"{name} allows 'unsafe-inline'.")
+        if "'unsafe-eval'" in values:
+            warnings.append(f"{name} allows 'unsafe-eval'.")
+
+    return warnings
+
 def check_security_headers():
     first_run = True
     while True:
@@ -60,6 +89,20 @@ def check_security_headers():
                         result = f"⚠️ {header} not found!\n{'-'*40}"
                     print(result)
                     logging.info(Functions.remove_emojis(result))
+
+                csp = headers.get("Content-Security-Policy")
+                if csp:
+                    warnings = analyze_csp(csp)
+                    if warnings:
+                        report = "⚠️ CSP review (review manually):\n" + "\n".join(f"- {warning}" for warning in warnings)
+                    else:
+                        report = "✅ CSP review: no common issues detected."
+                    print(report)
+                    logging.info(Functions.remove_emojis(report))
+                elif headers.get("Content-Security-Policy-Report-Only"):
+                    report = "⚠️ CSP is present only in report-only mode; violations are reported but not blocked."
+                    print(report)
+                    logging.warning(Functions.remove_emojis(report))
 
             print(f"\n🌐 Effective URL: {response.url}")
             logging.info(f"Effective URL: {response.url}")

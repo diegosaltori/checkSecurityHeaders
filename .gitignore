@@ -1,3 +1,4 @@
 # Ambiente virtual
 .venv/
 logs/
+__pycache__/
